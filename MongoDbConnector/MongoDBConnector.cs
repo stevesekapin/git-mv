@@ -16,7 +16,7 @@ public class MongoDBConnector
         _adminDb = _client.GetDatabase("admin");
     }
 
-    // No params; true if ping succeeds, false otherwise.
+    // Pings MongoDB. Returns true on success, false on failure. No parameters.
     public bool Ping()
     {
         try
