@@ -1,32 +1,65 @@
+using IDBConnector;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace MongoDbConnector;
-
-public class MongoDBConnector
+namespace MongoDbConnector
 {
-    private readonly string _connectionString;
-    private readonly IMongoClient _client;
-    private readonly IMongoDatabase _adminDb;
-
-    public MongoDBConnector(string connectionString)
+    public class MongoDbConnector : IDBConnector.IDBConnector
     {
-        _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
-        _client = new MongoClient(_connectionString);
-        _adminDb = _client.GetDatabase("admin");
-    }
+        private IMongoDatabase? _database;
+        private IMongoCollection<BsonDocument>? _collection;
 
-    // Pings MongoDB. Returns true on success, false on failure. No parameters.
-    public bool Ping()
-    {
-        try
+        public async Task<bool> ConnectAsync(string connectionString)
         {
-            _adminDb.RunCommand<BsonDocument>(new BsonDocument("ping", 1));
-            return true;
+            try
+            {
+                var client = new MongoClient(connectionString);
+                _database = client.GetDatabase("TestDb"); // You can rename if needed
+                _collection = _database.GetCollection<BsonDocument>("SampleData");
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
-        catch
+
+        public async Task<bool> PingAsync()
         {
-            return false;
+            if (_database == null)
+                return false;
+
+            try
+            {
+                await _database.RunCommandAsync((Command<BsonDocument>)"{ping:1}");
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task InsertManyAsync(IEnumerable<string> data)
+        {
+            if (_collection == null)
+                throw new InvalidOperationException("Not connected to database!");
+
+            var docs = data.Select(x => new BsonDocument("Value", x));
+            await _collection.InsertManyAsync(docs);
+        }
+
+        public async Task<string?> GetOneAsync(int index)
+        {
+            if (_collection == null)
+                throw new InvalidOperationException("Not connected to database!");
+
+            var results = await _collection.Find(new BsonDocument()).ToListAsync();
+
+            if (index < 0 || index >= results.Count)
+                return null;
+
+            return results[index]["Value"].AsString;
         }
     }
 }
