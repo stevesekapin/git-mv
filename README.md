@@ -1,15 +1,25 @@
-﻿# MongoDbConnector
+# Assignment 7: Integrating Docker in App Development  
+*Virginia State University – CS Program*
 
-Small C# class library that wraps a MongoDB connection and exposes a PingAsync() method.
+This project extends a database connector assignment by adding containerization support
+and interactive database testing through a REPL console application running inside Docker.
 
-## Prereqs
-- .NET 9 SDK
-- Docker Desktop running (for Testcontainers-based tests)
+---
 
-## Build & Test
+## 🎯 Project Objectives
 
-The tests spin up a temporary MongoDB in Docker via Testcontainers and validate both success and failure cases of PingAsync().
+✔ Implement IDBConnector interface for multiple database types  
+✔ Add support for MongoDB and PostgreSQL  
+✔ Implement REPL console application to:
+  - Select database type
+  - Provide connection string
+  - Attempt DB connection (ping test)
+  - Insert 20 records + retrieve 1 record  
+✔ Containerize the application with Docker  
+✔ Use proper GitHub workflow:
+  - Create Issue → Feature Branch → PR → Merge
 
-## Project Layout
-- MongoDbConnector/ – library (MongoDBConnector class)
-- MongoDbConnector.Tests/ – xUnit tests using Testcontainers
+---
+
+## 🗂 Project Structure
+
